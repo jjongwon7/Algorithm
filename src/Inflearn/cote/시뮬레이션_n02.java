@@ -2,17 +2,16 @@ package Inflearn.cote;
 
 import java.util.*;
 
-class Point {
-    int x;
-    int y;
-
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
 public class 시뮬레이션_n02 {
+    private static class Point {
+        int x;
+        int y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 
     public static int dx[] = {1, 0, -1, 0};
     public static int dy[] = {0, 1, 0, -1};
