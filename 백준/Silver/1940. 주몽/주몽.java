@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -6,32 +7,25 @@ public class Main {
         int n = sc.nextInt();
         int m = sc.nextInt();
         int[] material = new int[n];
-        boolean[] usedMaterial = new boolean[100001];
         int left = 0;
-        int right = 1;
+        int right = n - 1;
         int ans = 0;
 
         for (int i = 0; i < n; i++) {
             material[i] = sc.nextInt();
         }
 
-        while (left < n - 1) {
-            if (usedMaterial[material[left]]) {
-                left++;
-                right = left + 1;
+        Arrays.sort(material);
+
+        while (left < right) {
+            if (material[left] + material[right] > m) {
+                right--;
             } else if (material[left] + material[right] == m) {
-                usedMaterial[material[left]] = true;
-                usedMaterial[material[right]] = true;
                 ans++;
                 left++;
-                right = left + 1;
+                right--;
             } else {
-                if (right < n - 1) {
-                    right++;
-                } else {
-                    left++;
-                    right = left + 1;
-                }
+                left++;
             }
         }
 
