@@ -3,18 +3,28 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
-    public static void DP(long[][] arr) {
-        arr[1][1] = 1;
-        for (int i = 2; i <= 90; i++) {
-            arr[i][0] = arr[i-1][0] + arr[i-1][1];
-            arr[i][1] = arr[i-1][0];
-        }
-    }
+
+    static long[][] arr;
+
     public static void main(String[] args) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(bufferedReader.readLine());
-        long[][] arr = new long[91][2];
-        DP(arr);
-        System.out.println(arr[n][0] + arr[n][1]);
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        long n = Integer.parseInt(br.readLine());
+
+        arr = new long[(int) n][2];
+
+        arr[0][0] = 0;
+        arr[0][1] = 1;
+
+        for (int i = 1; i < n; i++) {
+            dp(i);
+        }
+
+        System.out.println(arr[(int) (n-1)][0] + arr[(int) (n-1)][1]);
+
+    }
+
+    public static void dp(int i) {
+        arr[i][0] = arr[i - 1][1] + arr[i - 1][0];
+        arr[i][1] = arr[i - 1][0];
     }
 }
