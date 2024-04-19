@@ -1,37 +1,41 @@
+import java.io.*;
 import java.util.Arrays;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int[] num = new int[n];
-        int ans = 0;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int[] arr = new int[n];
 
         for (int i = 0; i < n; i++) {
-            num[i] = sc.nextInt();
+            arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        Arrays.sort(num);
+        Arrays.sort(arr);
 
-        for (int targetIndex = 0; targetIndex < n; targetIndex++) {
+        int ans = 0;
+
+        for (int k = 0; k < n; k++) {
             int left = 0;
             int right = n - 1;
-            int target = num[targetIndex];
-            while (left < right) {
-                if (num[left] + num[right] > target) {
-                    right--;
-                } else if (num[left] + num[right] < target) {
-                    left++;
-                } else {
-                    if (left != targetIndex && right != targetIndex) {
+
+            while (left < right && right < n) {
+                if (arr[left] + arr[right] == arr[k]) {
+                    if (left == k) {
+                        left++;
+                    } else if (right == k) {
+                        right--;
+                    } else {
                         ans++;
                         break;
-                    } else if (left == targetIndex) {
-                        left++;
-                    } else {
-                        right--;
                     }
+                } else if (arr[left] + arr[right] < arr[k]) {
+                    left++;
+                } else {
+                    right--;
                 }
             }
         }
