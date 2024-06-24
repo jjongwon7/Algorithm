@@ -1,68 +1,69 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
 
 public class Main {
-
-    static int[] dr = {-1, 0, 1, 1};
-    static int[] dc = {1, 1, 1, 0};
-    static int[] reverseDr = {1, 0, -1, -1};
-    static int[] reverseDc = {-1, -1, -1, 0};
-    static int[][] concaveMap;
+    static int[][] arr;
+    static int[] dx = {1, 0, 1, -1};
+    static int[] dy = {0, 1, 1, 1};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        concaveMap = new int[20][20];
-
-        // 값 입력 (검정: 1, 흰색: 2, 빈칸: 0)
-        for (int r = 1; r < 20; r++) {
+        arr = new int[20][20];
+        for (int i = 1; i <= 19; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            for (int c = 1; c < 20; c++) {
-                concaveMap[r][c] = Integer.parseInt(st.nextToken());
+            for (int j = 1; j <= 19; j++) {
+                arr[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        for (int c = 1; c < 20; c++) {
-            for (int r = 1; r < 20; r++) {
-                if(concaveMap[r][c] != 0) {
-                    for (int i = 0; i < 4; i++) {
-                        int nextR = r + dr[i];
-                        int nextC = c + dc[i];
-
-                        if(nextR >=1 && nextR < 20 && nextC >=1 && nextC < 20 && concaveMap[nextR][nextC] == concaveMap[r][c]) {
-                            if (dfs(2, nextR, nextC, i, concaveMap[r][c]) == 5) {
-                                int reverseNextR = r + reverseDr[i];
-                                int reverseNextC = c + reverseDc[i];
-
-                                // 6목 이상이므로 정답 X
-                                if(reverseNextR >=1 && reverseNextR < 20 && reverseNextC >=1 && reverseNextC < 20 && concaveMap[reverseNextR][reverseNextC] == concaveMap[r][c]) {
-                                    continue;
-                                }
-
-                                // 정답인 경우
-                                System.out.println(concaveMap[r][c]);
-                                System.out.println(r + " " + c);
-                                return ;
-                            }
-                        }
+        for (int i = 1; i <= 19; i++) {
+            for (int j = 1; j <= 19; j++) {
+                if (arr[i][j] != 0) {
+                    if (checkWin(i, j)) {
+                        System.out.println(arr[i][j]);
+                        System.out.println(i + " " + j);
+                        return;
                     }
                 }
             }
         }
 
-        // 승부가 결정되지 않은 경우
         System.out.println(0);
     }
 
-    public static int dfs(int depth, int r, int c, int directionIdx, int color) {
-        int nextR = r + dr[directionIdx];
-        int nextC = c + dc[directionIdx];
+    static boolean checkWin(int x, int y) {
+        for (int i = 0; i < 4; i++) {
+            int count = 1;
+            int nx = x + dx[i];
+            int ny = y + dy[i];
 
-        if(nextR >=1 && nextR < 20 && nextC >=1 && nextC < 20 && concaveMap[nextR][nextC] == color) {
-            return dfs(depth + 1, nextR, nextC, directionIdx, concaveMap[r][c]);
+            while (isInBounds(nx, ny) && arr[x][y] == arr[nx][ny]) {
+                count++;
+                nx += dx[i];
+                ny += dy[i];
+            }
+
+            nx = x - dx[i];
+            ny = y - dy[i];
+
+            while (isInBounds(nx, ny) && arr[x][y] == arr[nx][ny]) {
+                count++;
+                nx -= dx[i];
+                ny -= dy[i];
+            }
+
+            if (count == 5) {
+                // 5일때 반대 방향에 동일한 바둑알 있으면 6개이므로 continue
+                if (isInBounds(x - dx[i], y - dy[i]) && arr[x - dx[i]][y - dy[i]] == arr[x][y]) {
+                    continue;
+                }
+                return true;
+            }
         }
+        return false;
+    }
 
-        return depth;
+    static boolean isInBounds(int x, int y) {
+        return x >= 1 && x <= 19 && y >= 1 && y <= 19;
     }
 }
