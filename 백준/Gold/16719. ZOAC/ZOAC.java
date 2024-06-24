@@ -1,65 +1,49 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class Main {
 
     static char[] arr;
     static boolean[] isSelected;
-    static int[] orders;
-    static int cnt;
     static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         arr = br.readLine().toCharArray();
         isSelected = new boolean[arr.length];
-        Set<Character> set = new TreeSet<>();
+        int selectedCnt = 0;
 
-        for (char c : arr) {
-            set.add(c);
-        }
-
-        int order = 1;
-        orders = new int[arr.length];
-
-        for (Character character : set) {
-            for (int i = 0; i < arr.length; i++) {
-                if (character == arr[i]) {
-                    orders[i] = order;
-                }
-                order++;
-            }
-        }
-
-        while (cnt < arr.length) {
-            dfs(0);
+        while (selectedCnt < arr.length) {
+            selectedCnt += dfs(0);
         }
 
         System.out.println(sb);
     }
 
-    public static void dfs(int startIdx) {
+    public static int dfs(int startIdx) {
+        // 시작 인덱스가 배열 사이즈를 초과한 경우 처리
         if (startIdx >= arr.length) {
-            return ;
+            return 0;
         }
 
-        int minOrder = Integer.MAX_VALUE;
+        int selectedCnt = 0;
+        char minChar = 'Z' + 1;
         int minOrderIdx = arr.length;
 
+        // 가장 앞 쪽에 위치한 가장 작은 문자 추출
         for (int i = startIdx; i < arr.length; i++) {
             if (!isSelected[i]) {
-                if (minOrder > orders[i]) {
+                if (minChar > arr[i]) {
                     minOrderIdx = i;
-                    minOrder = orders[i];
+                    minChar = arr[i];
                 }
             }
         }
 
+        // 이미 모두 선택된 경우 처리
         if (minOrderIdx == arr.length) {
-            return ;
+            return 0;
         }
 
         isSelected[minOrderIdx] = true;
@@ -71,10 +55,14 @@ public class Main {
         }
 
         sb.append("\n");
-        cnt++;
+        selectedCnt++;
 
-        for (int i = minOrderIdx + 1; i < arr.length; i++) {
-            dfs(minOrderIdx + 1);
+        while (true) {
+            int cnt = dfs(minOrderIdx + 1);
+            if (cnt == 0) break;
+            selectedCnt += cnt;
         }
+
+        return selectedCnt;
     }
 }
