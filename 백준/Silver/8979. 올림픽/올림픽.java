@@ -28,7 +28,7 @@ public class Main {
         List<Country> list = new ArrayList<>();
         int rank = 1;
 
-        for (int i = 0; i < k; i++) {
+        while (true) {
             Country curCountry = pQ.poll();
 
             if (list.size() > 0) {
@@ -41,6 +41,10 @@ public class Main {
 
             curCountry.rank = rank;
             list.add(curCountry);
+
+            if (curCountry.num == k) {
+                break;
+            }
         }
 
         System.out.println(rank);
