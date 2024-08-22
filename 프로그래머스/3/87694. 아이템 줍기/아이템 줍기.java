@@ -7,11 +7,8 @@ class Solution {
     static int[] dx = {1, 0, -1, 0};
     static int[] dy = {0, 1, 0, -1};
     
-    // rectangle => int[][4] : 좌하단x, y / 우상단 x, y
-    // characterX, Y => 초기 캐릭터 위치
-    // itemX, Y => 아이템의 위치
     public int solution(int[][] rectangle, int characterX, int characterY, int itemX, int itemY) {
-        characterX *= 2; // 초기 캐릭터 위치
+        characterX *= 2;
         characterY *= 2;
         itemX *= 2;
         itemY *= 2;
