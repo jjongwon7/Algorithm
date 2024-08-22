@@ -2,8 +2,8 @@ import java.util.*;
 
 class Solution {
 
-    static boolean[][] visited = new boolean[102][102];
-    static int[][] movable = new int[102][102]; // -1: 이동 불가, 0: 아직 판단 X, 1: 이동 가능
+    static boolean[][] visited = new boolean[101][101];
+    static int[][] movable = new int[101][101]; // -1: 이동 불가, 0: 아직 판단 X, 1: 이동 가능
     static int[] dx = {1, 0, -1, 0};
     static int[] dy = {0, 1, 0, -1};
     
@@ -53,7 +53,7 @@ class Solution {
                         return answer / 2;
                     }
                     
-                    if(movable[ny][nx] == 1 && !visited[ny][nx] && nx >= 2 && ny >= 2 && nx <= 100 && ny <= 100) {
+                    if(nx >= 2 && ny >= 2 && nx <= 100 && ny <= 100 && movable[ny][nx] == 1 && !visited[ny][nx]) {
                         visited[ny][nx] = true;
                         queue.offer(new Point(nx, ny));
                     }
