@@ -2,16 +2,14 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-
-    static Map<Character, Integer> numberMap = new HashMap<>();
-    static int[][] board;
     static int n;
     static int maxBlock = Integer.MIN_VALUE;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         n = Integer.parseInt(br.readLine());
-        board = new int[n][n];
+        int[][] board = new int[n][n];
+
         for (int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
@@ -19,8 +17,6 @@ public class Main {
             }
         }
 
-        // 2^10 * 20 * 20 => 2^12 완탐 가능
-        // return: 최대 5번 이동해서 만들 수 있는 가장 큰 블록
         dfs(0, board);
         System.out.println(maxBlock);
     }
@@ -37,13 +33,13 @@ public class Main {
             return ;
         }
 
-        dfs(playCnt + 1, moveLeft(boardToMove));
-        dfs(playCnt + 1, moveRight(boardToMove));
-        dfs(playCnt + 1, moveTop(boardToMove));
-        dfs(playCnt + 1, moveDown(boardToMove));
+        // 상하좌우 모두 탐색 대상
+        for (Direction direction : Direction.values()) {
+            dfs(playCnt + 1, move(boardToMove, direction));
+        }
     }
 
-    public static int[][] moveLeft(int[][] boardToMove) {
+    public static int[][] move(int[][] boardToMove, Direction direction) {
         int[][] movedBoard = new int[n][n];
 
         for (int i = 0; i < n; i++) {
@@ -52,134 +48,91 @@ public class Main {
             int fixedCnt = 0;
 
             for (int j = 0; j < n; j++) {
-                if (merged == 0 && boardToMove[i][j] != 0) {
-                    merged = boardToMove[i][j];
-                } else if (merged != 0 && boardToMove[i][j] != 0) {
-                    // 숫자가 같은 경우 블록 합침
-                    if (merged == boardToMove[i][j]) {
-                        movedBoard[i][mergedCnt + fixedCnt] = merged * 2;
+                int x = 0;
+                int y = 0;
+
+                switch (direction) {
+                    case LEFT:
+                        x = i;
+                        y = j;
+                        break;
+                    case RIGHT:
+                        x = i;
+                        y = n - 1 - j;
+                        break;
+                    case UP:
+                        x = j;
+                        y = i;
+                        break;
+                    case DOWN:
+                        x = n - 1 - j;
+                        y = i;
+                }
+
+                if (merged == 0 && boardToMove[x][y] != 0) {
+                    merged = boardToMove[x][y];
+                } else if (merged != 0 && boardToMove[x][y] != 0) {
+                    if (merged == boardToMove[x][y]) {
+                        switch (direction) {
+                            case LEFT:
+                                movedBoard[x][mergedCnt + fixedCnt] = merged * 2;
+                                break;
+                            case RIGHT:
+                                movedBoard[x][n - 1 - (mergedCnt + fixedCnt)] = merged * 2;
+                                break;
+                            case UP:
+                                movedBoard[mergedCnt + fixedCnt][y] = merged * 2;
+                                break;
+                            case DOWN:
+                                movedBoard[n - 1 - (mergedCnt + fixedCnt)][y] = merged * 2;
+                        }
+
                         mergedCnt++;
                         merged = 0;
                     }
-                    // 숫자가 다른 경우 이전 블록은 합쳐질 수 없음 (즉, 위치 고정)
+
                     else {
+                        switch (direction) {
+                            case LEFT:
+                                movedBoard[x][mergedCnt + fixedCnt] = merged;
+                                break;
+                            case RIGHT:
+                                movedBoard[x][n - 1 - (mergedCnt + fixedCnt)] = merged;
+                                break;
+                            case UP:
+                                movedBoard[mergedCnt + fixedCnt][y] = merged;
+                                break;
+                            case DOWN:
+                                movedBoard[n - 1 - (mergedCnt + fixedCnt)][y] = merged;
+                        }
+
+                        fixedCnt++;
+                        merged = boardToMove[x][y];
+                    }
+                }
+            }
+
+            if (merged != 0) {
+                switch (direction) {
+                    case LEFT:
                         movedBoard[i][mergedCnt + fixedCnt] = merged;
-                        fixedCnt++;
-                        merged = boardToMove[i][j];
-                    }
-                }
-            }
-
-            if (merged != 0) {
-                movedBoard[i][mergedCnt + fixedCnt] = merged;
-            }
-        }
-
-        return movedBoard;
-    }
-
-    public static int[][] moveRight(int[][] boardToMove) {
-        int[][] movedBoard = new int[n][n];
-
-        for (int i = 0; i < n; i++) {
-            int merged = 0;
-            int mergedCnt = 0;
-            int fixedCnt = 0;
-
-            for (int j = n - 1; j >= 0; j--) {
-                if (merged == 0 && boardToMove[i][j] != 0) {
-                    merged = boardToMove[i][j];
-                } else if (merged != 0 && boardToMove[i][j] != 0) {
-                    // 숫자가 같은 경우 블록 합침
-                    if (merged == boardToMove[i][j]) {
-                        movedBoard[i][n - 1 - (mergedCnt + fixedCnt)] = merged * 2;
-                        mergedCnt++;
-                        merged = 0;
-                    }
-                    // 숫자가 다른 경우 이전 블록은 합쳐질 수 없음 (즉, 위치 고정)
-                    else {
+                        break;
+                    case RIGHT:
                         movedBoard[i][n - 1 - (mergedCnt + fixedCnt)] = merged;
-                        fixedCnt++;
-                        merged = boardToMove[i][j];
-                    }
+                        break;
+                    case UP:
+                        movedBoard[mergedCnt + fixedCnt][i] = merged;
+                        break;
+                    case DOWN:
+                        movedBoard[n - 1 - (mergedCnt + fixedCnt)][i] = merged;
                 }
-            }
-
-            if (merged != 0) {
-                movedBoard[i][n - 1 - (mergedCnt + fixedCnt)] = merged;
             }
         }
 
         return movedBoard;
     }
 
-    public static int[][] moveTop(int[][] boardToMove) {
-        int[][] movedBoard = new int[n][n];
-
-        for (int j = 0; j < n; j++) {
-            int merged = 0;
-            int mergedCnt = 0;
-            int fixedCnt = 0;
-
-            for (int i = 0; i < n; i++) {
-                if (merged == 0 && boardToMove[i][j] != 0) {
-                    merged = boardToMove[i][j];
-                } else if (merged != 0 && boardToMove[i][j] != 0) {
-                    // 숫자가 같은 경우 블록 합침
-                    if (merged == boardToMove[i][j]) {
-                        movedBoard[mergedCnt + fixedCnt][j] = merged * 2;
-                        mergedCnt++;
-                        merged = 0;
-                    }
-                    // 숫자가 다른 경우 이전 블록은 합쳐질 수 없음 (즉, 위치 고정)
-                    else {
-                        movedBoard[mergedCnt + fixedCnt][j] = merged;
-                        fixedCnt++;
-                        merged = boardToMove[i][j];
-                    }
-                }
-            }
-
-            if (merged != 0) {
-                movedBoard[mergedCnt + fixedCnt][j] = merged;
-            }
-        }
-
-        return movedBoard;
-    }
-
-    public static int[][] moveDown(int[][] boardToMove) {
-        int[][] movedBoard = new int[n][n];
-
-        for (int j = 0; j < n; j++) {
-            int merged = 0;
-            int mergedCnt = 0;
-            int fixedCnt = 0;
-
-            for (int i = n - 1; i >= 0; i--) {
-                if (merged == 0 && boardToMove[i][j] != 0) {
-                    merged = boardToMove[i][j];
-                } else if (merged != 0 && boardToMove[i][j] != 0) {
-                    // 숫자가 같은 경우 블록 합침
-                    if (merged == boardToMove[i][j]) {
-                        movedBoard[n - 1 - (mergedCnt + fixedCnt)][j] = merged * 2;
-                        mergedCnt++;
-                        merged = 0;
-                    }
-                    // 숫자가 다른 경우 이전 블록은 합쳐질 수 없음 (즉, 위치 고정)
-                    else {
-                        movedBoard[n - 1 - (mergedCnt + fixedCnt)][j] = merged;
-                        fixedCnt++;
-                        merged = boardToMove[i][j];
-                    }
-                }
-            }
-
-            if (merged != 0) {
-                movedBoard[n - 1 - (mergedCnt + fixedCnt)][j] = merged;
-            }
-        }
-
-        return movedBoard;
+    public enum Direction {
+        LEFT, RIGHT, UP, DOWN
     }
 }
