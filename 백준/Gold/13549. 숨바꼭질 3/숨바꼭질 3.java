@@ -1,63 +1,66 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main {
-    static boolean[] check = new boolean[100001];
 
-    static class Subin {
-        int location;
-        int time;
+    static int[] walk = {-1, 1};
 
-        public Subin(int location, int time) {
-            this.location = location;
-            this.time = time;
-        }
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int n = Integer.parseInt(st.nextToken()); // 수빈
+        int k = Integer.parseInt(st.nextToken()); // 동생
+        System.out.println(bfs(n, k));
     }
-    public static int BFS(int n, int k) {
-        Queue<Subin> queue = new LinkedList<>();
-        queue.offer(new Subin(n, 0));
+
+    public static int bfs(int n, int k) {
+        boolean[] visited = new boolean[100001];
+        int moveCnt = 0;
+
+        Queue<Integer> queue = new LinkedList<>();
+        while (n <= 100000) {
+            visited[n] = true;
+            queue.offer(n);
+            n *= 2;
+
+            if (n == 0) break;
+        }
+
         while (!queue.isEmpty()) {
-            int len = queue.size();
-            for (int i = 0; i < len; i++) {
-                Subin subin = queue.poll();
-                if (subin.location == k) {
-                    return subin.time;
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++) {
+                int curPos = queue.poll();
+
+                if (curPos == k) {
+                    return moveCnt;
                 }
-                int nextLocation = subin.location * 2;
-                // 0초 후에 이동하는 경우 처리
-                while (nextLocation <= 100000) {
-                    if (check[nextLocation] == false) {
-                        check[nextLocation] = true;
-                        queue.offer(new Subin(nextLocation, subin.time));
-                        nextLocation *= 2;
-                    } else {
-                        break;
-                    }
-                }
-                // 1초 후에 이동하는 두 가지 경우 처리
-                for (int j = 0; j < 2; j++) {
-                    switch (j) {
-                        case 0: // X + 1로 이동하는 경우
-                           nextLocation = subin.location + 1;
-                           break;
-                        case 1: // X - 1로 이동하는 경우
-                            nextLocation = subin.location - 1;
-                    }
-                    // 방문한 적 없는 지점이면 큐에 저장
-                    if (nextLocation >= 0 && nextLocation <= 100000 && check[nextLocation] == false) {
-                        queue.offer(new Subin(nextLocation, subin.time + 1));
-                        check[nextLocation] = true;
+
+                // 걷기
+                for (int direction = 0; direction < 2; direction++) {
+                    int nextPos = curPos + walk[direction];
+
+                    if (nextPos <= 100000 && nextPos >= 0 && !visited[nextPos]) {
+                        while (nextPos <= 100000) {
+                            if (nextPos == k) {
+                                return moveCnt + 1;
+                            }
+
+                            if (!visited[nextPos]) {
+                                visited[nextPos] = true;
+                                queue.offer(nextPos);
+                            } else {
+                                break;
+                            }
+                            nextPos *= 2;
+                        }
                     }
                 }
             }
+
+            moveCnt++;
         }
-        return -1;
-    }
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int k = sc.nextInt();
-        System.out.println(BFS(n, k));
+
+        return 0;
     }
 }
