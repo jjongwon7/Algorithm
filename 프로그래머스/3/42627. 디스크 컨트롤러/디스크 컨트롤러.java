@@ -2,43 +2,38 @@ import java.util.*;
 
 class Solution {
     public int solution(int[][] jobs) {
-        int curTime = 0;
-        int endTime = 0;
-        int ans = 0;
-        int waitIdx = 0;
-        int cnt = 0;
-        boolean flag = true;
-        
         Arrays.sort(jobs, (o1, o2) -> o1[0] - o2[0]);
+        PriorityQueue<Work> pQ = new PriorityQueue<>();
+        int clearCnt = 0;
+        int curTime = 0;
+        int nextIdx = 0;
+        int sum = 0;
         
-        PriorityQueue<Work> workPQ = new PriorityQueue<>();
-        
-        while(cnt < jobs.length) {
-            while(waitIdx < jobs.length && jobs[waitIdx][0] <= endTime) {
-                workPQ.offer(new Work(jobs[waitIdx][0], jobs[waitIdx++][1]));
+        while(clearCnt < jobs.length) {
+            while(nextIdx < jobs.length && jobs[nextIdx][0] <= curTime) {
+                pQ.offer(new Work(jobs[nextIdx][0], jobs[nextIdx++][1]));
             }
-            // 2. 작업큐에 넣은 작업 중 소요시간이 가장 짧은 작업을 실행한다.
-            if(!workPQ.isEmpty()) {
-                Work work = workPQ.poll();
-                ans += (endTime - work.request + work.workTime);
-                endTime += work.workTime;
-                cnt++;
+            
+            if(pQ.isEmpty()) {
+                curTime++;
+                continue;
             }
-            // 3. 현재 실행 가능한 작업이 없다면, 시간을 증가시킨다.
-            else {
-                endTime = jobs[waitIdx][0];
-            }
+            
+            Work work = pQ.poll();
+            sum += (curTime + work.workTime - work.requestTime);
+            curTime += work.workTime;
+            clearCnt++;
         }
         
-        return (ans) / jobs.length;
+        return sum / jobs.length;
     }
     
-    static class Work implements Comparable<Work> {
-        int request;
+    public class Work implements Comparable<Work> {
+        int requestTime;
         int workTime;
         
-        public Work(int request, int workTime) {
-            this.request = request;
+        public Work (int requestTime, int workTime) {
+            this.requestTime = requestTime;
             this.workTime = workTime;
         }
         
