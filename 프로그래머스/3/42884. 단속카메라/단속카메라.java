@@ -2,40 +2,22 @@ import java.util.*;
 
 class Solution {
     public int solution(int[][] routes) {
-        int answer = 0;
+        Arrays.sort(routes, (o1, o2) -> o1[1] - o2[1]);
+        int prePos = -30001;
+        int cnt = 0;
         
-        CarPath[] carPaths = new CarPath[routes.length];
-        
-        for(int i=0; i<routes.length; i++) {
-            carPaths[i] = new CarPath(routes[i][0], routes[i][1]);
-        }
-        
-        Arrays.sort(carPaths);
-        
-        int cameraPoint = -30001;
-        
-        for(CarPath carPath : carPaths) {
-            if(cameraPoint < carPath.in) {
-                cameraPoint = carPath.out;
-                answer++;
-            }
-        }
-        
-        return answer;
-    }
-    
-    static class CarPath implements Comparable<CarPath> {
-        int in;
-        int out;
+        for(int[] route : routes) {
+            int st = route[0];
+            int et = route[1];
             
-        public CarPath(int in, int out) {
-            this.in = in;
-            this.out = out;
+            if(prePos >= st) {
+                continue;
+            }
+            
+            prePos = et;
+            cnt++;
         }
         
-        @Override
-        public int compareTo(CarPath c) {
-            return this.out - c.out;
-        }
+        return cnt;
     }
 }
