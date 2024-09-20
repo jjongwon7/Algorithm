@@ -11,7 +11,7 @@ class Solution {
         
         Arrays.sort(jobs, (o1, o2) -> o1[0] - o2[0]);
         
-        PriorityQueue<Work> workPQ = new PriorityQueue<>((o1, o2) -> o1.workTime - o2.workTime);
+        PriorityQueue<Work> workPQ = new PriorityQueue<>();
         
         while(cnt < jobs.length) {
             while(waitIdx < jobs.length && jobs[waitIdx][0] <= endTime) {
