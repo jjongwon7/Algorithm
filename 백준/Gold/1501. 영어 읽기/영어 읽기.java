@@ -22,8 +22,7 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < m; i++) {
-            String sentence = br.readLine();
-            sb.append(translate(sentence)).append("\n");
+            sb.append(translate(br.readLine())).append("\n");
         }
 
         System.out.println(sb);
@@ -36,24 +35,21 @@ public class Main {
             return;
         }
 
-        // ex) abcd -> ad
+        // 첫과 마지막 단어 추출
         String firstAndLastCharacter = String.valueOf(word.charAt(0)) + word.charAt(word.length() - 1);
+        dictionaryAboutLongWords.putIfAbsent(firstAndLastCharacter, new HashMap<>());
 
-        if (!dictionaryAboutLongWords.containsKey(firstAndLastCharacter)) {
-            dictionaryAboutLongWords.put(firstAndLastCharacter, new HashMap<>());
-        }
+        // 첫과 마지막 단어 제거 후 정렬된 문자열
+        String removedFirstAndLastCharacterAndSorted = RemoveFirstAndLastCharacterAndSort(word);
 
-        // key: 단어의 맨 앞과 뒤 문자를 제거하고 사전순으로 정렳한 문자열, value: 그런 문자열의 개수
-        Map<String, Integer> map = dictionaryAboutLongWords.get(firstAndLastCharacter);
-
-        String sortedAndRemovedFirstAndLastCharacter = sortAndRemoveFirstAndLastCharacter(word);
-
-        map.put(sortedAndRemovedFirstAndLastCharacter,
-                map.getOrDefault(sortedAndRemovedFirstAndLastCharacter, 0) + 1);
+        // map에 개수 추가
+        Map<String, Integer> translationCountMap = dictionaryAboutLongWords.get(firstAndLastCharacter);
+        translationCountMap.put(removedFirstAndLastCharacterAndSorted,
+                translationCountMap.getOrDefault(removedFirstAndLastCharacterAndSorted, 0) + 1);
     }
 
-    private static String sortAndRemoveFirstAndLastCharacter(String word) {
-        // ex) abcd -> bc
+    private static String RemoveFirstAndLastCharacterAndSort(String word) {
+        // 첫과 마지막 문자 제거 후 정렬
         String removedFirstAndLastCharacter = word.substring(1, word.length() - 1);
         char[] chars = removedFirstAndLastCharacter.toCharArray();
         Arrays.sort(chars);
@@ -62,7 +58,7 @@ public class Main {
 
     public static int translate(String sentence) {
         String[] words = sentence.split(" ");
-        int count = 1;
+        int translationCount = 1;
         boolean translateYn = false;
 
         for (String word : words) {
@@ -70,25 +66,28 @@ public class Main {
             if (word.length() < 4) {
                 if (dictionaryAboutShortWords.contains(word)) {
                     translateYn = true;
-                    continue;
                 }
+                continue;
             }
 
+            // 첫과 마지막 단어 추출
             String firstAndLastCharacter = String.valueOf(word.charAt(0)) + word.charAt(word.length() - 1);
 
+            // 사전에 단어가 존재하지 않는 경우 예외 처리
             if (!dictionaryAboutLongWords.containsKey(firstAndLastCharacter)) {
                 continue;
             }
 
-            Map<String, Integer> map = dictionaryAboutLongWords.get(firstAndLastCharacter);
-            String sortedAndRemovedFirstAndLastCharacter = sortAndRemoveFirstAndLastCharacter(word);
+            Map<String, Integer> translationCountMap = dictionaryAboutLongWords.get(firstAndLastCharacter);
+            String removedFirstAndLastCharacterAndSorted = RemoveFirstAndLastCharacterAndSort(word);
 
-            if (map.containsKey(sortedAndRemovedFirstAndLastCharacter)) {
+            // 해석 가능한 경우 translationCount 갱신
+            if (translationCountMap.containsKey(removedFirstAndLastCharacterAndSorted)) {
                 translateYn = true;
-                count *= map.get(sortedAndRemovedFirstAndLastCharacter);
+                translationCount *= translationCountMap.get(removedFirstAndLastCharacterAndSorted);
             }
         }
 
-        return translateYn ? count : 0;
+        return translateYn ? translationCount : 0;
     }
 }
