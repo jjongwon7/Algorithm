@@ -1,56 +1,31 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
-        Meeting[] arr = new Meeting[n];
+        int[][] arr = new int[n][2];
 
         for (int i = 0; i < n; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
+            String[] split = br.readLine().split(" ");
 
-            int start = Integer.parseInt(st.nextToken());
-            int end = Integer.parseInt(st.nextToken());
-
-            arr[i] = new Meeting(start, end);
+            arr[i][0] = Integer.parseInt(split[0]);
+            arr[i][1] = Integer.parseInt(split[1]);
         }
 
-        Arrays.sort(arr, Comparator.comparingInt(Meeting::getEnd).thenComparingInt(Meeting::getStart));
+        Arrays.sort(arr, (o1, o2) -> {
+            if(o1[1] == o2[1]) return o1[0] - o2[0];
+            return o1[1] - o2[1];
+        });
 
-        alloc(arr);
-    }
-
-    static class Meeting {
-        int start;
-        int end;
-
-        public Meeting(int start, int end) {
-            this.start = start;
-            this.end = end;
-        }
-
-        public int getStart() {
-            return start;
-        }
-
-        public int getEnd() {
-            return end;
-        }
-    }
-
-    public static void alloc(Meeting[] arr) {
+        int preEnd = 0;
         int cnt = 0;
-        int end = 0;
 
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i].start >= end) {
+        for (int i = 0; i < n; i++) {
+            if (preEnd <= arr[i][0]) {
                 cnt++;
-                end = arr[i].end;
+                preEnd = arr[i][1];
             }
         }
 
