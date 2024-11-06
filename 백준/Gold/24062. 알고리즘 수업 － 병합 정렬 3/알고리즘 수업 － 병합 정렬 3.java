@@ -78,7 +78,8 @@ public class Main {
                     printResultAndExit(1);
                 }
             } else {
-                arrA[div1Idx++] = temp[tempIdx++];
+                div1Idx++;
+                tempIdx++;
             }
         }
     }
